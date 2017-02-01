@@ -6,6 +6,9 @@ package ca.ualberta.cs.lonelytwitter;
 
 import java.util.Date;
 
+/**
+ * Interface for objects that will be able to be sent as tweets.
+ */
 public interface Tweetable {
     public String getMessage();
     public Date getDate();
