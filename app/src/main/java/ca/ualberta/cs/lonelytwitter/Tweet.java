@@ -1,5 +1,8 @@
 package ca.ualberta.cs.lonelytwitter;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
 public abstract class Tweet implements Tweetable {

@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class LonelyTwitterActivity extends Activity {
+	private LonelyTwitterActivity activity = this;
 
 	private static final String FILENAME = "file.sav";
 	private EditText bodyText;
@@ -35,6 +36,9 @@ public class LonelyTwitterActivity extends Activity {
 	private ArrayAdapter<NormalTweet> adapter;
 
 
+	public ListView getOldTweetsList() {
+		return oldTweetsList;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -53,10 +57,10 @@ public class LonelyTwitterActivity extends Activity {
 				String text = bodyText.getText().toString();
 				NormalTweet newTweet = new NormalTweet(text);
 				tweetList.add(newTweet);
+				saveInFile(); // TODO replace this with elastic search
 				adapter.notifyDataSetChanged();
-				//saveInFile(); // TODO replace this with elastic search
-				ElasticsearchTweetController.AddTweetsTask addTweetsTask = new ElasticsearchTweetController.AddTweetsTask();
-				addTweetsTask.execute(newTweet);
+				//ElasticsearchTweetController.AddTweetsTask addTweetsTask = new ElasticsearchTweetController.AddTweetsTask();
+				//addTweetsTask.execute(newTweet);
 			}
 		});
 
@@ -64,18 +68,21 @@ public class LonelyTwitterActivity extends Activity {
 
 			public void onClick(View v) {
 				setResult(RESULT_OK);
-				ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
-				getTweetsTask.execute(bodyText.getText().toString());
-
-				try {
-					tweetList = getTweetsTask.get();
-				} catch (Exception e){
-					Log.i("Error","Failed to get the tweets from the async object");
-				}
+				tweetList.clear();
+				deleteFile(FILENAME);
+				//ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
+				//getTweetsTask.execute(bodyText.getText().toString());
 				adapter.notifyDataSetChanged();
 			}
 		});
 
+		oldTweetsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				Intent intent = new Intent(activity, EditTweetActivity.class);
+				intent.putExtra("tweet", tweetList.get(i).getMessage());
+				startActivity(intent);
+			}
+		});
 
 	}
 
@@ -83,15 +90,10 @@ public class LonelyTwitterActivity extends Activity {
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		//loadFromFile(); // TODO replace this with elastic search
-		ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
-		getTweetsTask.execute("");
+		loadFromFile(); // TODO replace this with elastic search
+		//ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
+		//getTweetsTask.execute("");
 
-		try {
-			tweetList = getTweetsTask.get();
-		} catch (Exception e){
-			Log.i("Error","Failed to get the tweets from the async object");
-		}
 
 		adapter = new ArrayAdapter<NormalTweet>(this,
 				R.layout.list_item, tweetList);
