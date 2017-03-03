@@ -1,5 +1,4 @@
 package ca.ualberta.cs.lonelytwitter;
-
 import java.util.Date;
 
 /**
@@ -38,4 +37,9 @@ public class ImportantTweet extends Tweet {
     public String getMessage() {
         return super.getMessage() + "!!!!!";
     }
+
+    public Date getDate() {
+        return null;
+    }
+
 }

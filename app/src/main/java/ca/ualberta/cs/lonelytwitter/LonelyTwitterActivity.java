@@ -17,13 +17,15 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -58,6 +60,7 @@ import com.google.gson.reflect.TypeToken;
  * @since 0.5
  */
 public class LonelyTwitterActivity extends Activity {
+	private LonelyTwitterActivity activity = this;
 	/**
 	 * The file that all the tweets are saved in. The format of the file is JSON.
 	 * @see #loadFromFile()
@@ -69,10 +72,18 @@ public class LonelyTwitterActivity extends Activity {
 	private EditText bodyText;
 	private ListView oldTweetsList;
 
-	private ArrayList<Tweet> tweetList; /* CHANGE */
-	private ArrayAdapter<Tweet> adapter; /* CHANGE */
 
 	/** Called when the activity is first created. */
+
+	private ArrayList<NormalTweet> tweetList = new ArrayList<NormalTweet>();
+	private ArrayAdapter<NormalTweet> adapter;
+
+
+	public ListView getOldTweetsList() {
+		return oldTweetsList;
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -89,7 +100,7 @@ public class LonelyTwitterActivity extends Activity {
 			public void onClick(View v) {
 				setResult(RESULT_OK);
 				String text = bodyText.getText().toString();
-				Tweet tweet = new NormalTweet(text);
+				NormalTweet tweet = new NormalTweet(text);
 				tweetList.add(tweet);
 				adapter.notifyDataSetChanged();
 				saveInFile();
@@ -101,48 +112,34 @@ public class LonelyTwitterActivity extends Activity {
 			public void onClick(View v) {
 				setResult(RESULT_OK);
 				tweetList.clear();
+				deleteFile(FILENAME);
 				adapter.notifyDataSetChanged();
-				saveInFile();
+			}
+
+
+		});
+
+		oldTweetsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				Intent intent = new Intent(activity, EditTweetActivity.class);
+				intent.putExtra("tweet", tweetList.get(i).getMessage());
+				startActivity(intent);
 			}
 		});
 	}
 
-	@Override
-	protected void onStart() {
-		// TODO Auto-generated method stub
-		super.onStart();
+		@Override
+		protected void onStart() {
+			// TODO Auto-generated method stub
+			super.onStart();
 
-		loadFromFile();
+			loadFromFile();
 
-		adapter = new ArrayAdapter<Tweet>(this, R.layout.list_item, tweetList);
-		oldTweetsList.setAdapter(adapter);
-	}
+			adapter = new ArrayAdapter<NormalTweet>(this, R.layout.list_item, tweetList);
+			oldTweetsList.setAdapter(adapter);
+		}
 
-	/**
-	 * Trims extra spaces using regex.
-	 * @param inputString string that needs to be cleared of extra spaces.
-	 * @return Trimmed string.
-     */
 
-	private String trimExtraSpaces(String inputString) {
-		inputString = inputString.replaceAll("\\s+", " ");
-		return inputString;
-	}
-
-	/**
-	 * This method sorts items in the tweet list and refreshes the adapter.
-	 * @param ordering ordering to be used.
-     */
-	private void sortTweetListItems(TweetListOrdering ordering){
-
-	}
-
-	/**
-	 * Loads tweets from specified file.
-	 *
-	 * @throws TweetTooLongException if the text in the tweet is too long.
-	 * @exception FileNotFoundException if the file has not yet been created, or cannot be found.
-	 */
 	private void loadFromFile() {
 		try {
 			FileInputStream fis = openFileInput(FILENAME);
@@ -155,10 +152,8 @@ public class LonelyTwitterActivity extends Activity {
 			tweetList = gson.fromJson(in, listType);
 
 		} catch (FileNotFoundException e) {
-			tweetList = new ArrayList<Tweet>();
-		} catch (IOException e) {
-			throw new RuntimeException();
-		}
+			tweetList = new ArrayList<NormalTweet>();
+		} catch (IOException e) {}
 	}
 
 	/**
@@ -179,9 +174,6 @@ public class LonelyTwitterActivity extends Activity {
 		} catch (FileNotFoundException e) {
 			// TODO: Handle the Exception later
 			throw new RuntimeException();
-		} catch (IOException e) {
-			throw new RuntimeException();
+		} catch (IOException e) {}
 		}
 	}
-}
-

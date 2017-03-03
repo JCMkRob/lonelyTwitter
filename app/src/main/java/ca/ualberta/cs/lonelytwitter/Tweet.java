@@ -15,7 +15,7 @@ public abstract class Tweet implements Tweetable {
     private String message;
     private ArrayList<Mood> moodArrayList = new ArrayList<Mood>();
 
-    public Tweet(Date date, String message) throws TweetTooLongException {
+    public Tweet(Date date, String message)  {
         this.setMessage(message);
         this.date = date;
     }
@@ -32,10 +32,6 @@ public abstract class Tweet implements Tweetable {
      */
     public abstract Boolean isImportant();
 
-    public Date getDate() {
-        return date;
-    }
-
     /**
      * Sets date.
      *
@@ -49,9 +45,9 @@ public abstract class Tweet implements Tweetable {
         return message;
     }
 
-    public void setMessage(String message) throws TweetTooLongException {
+    public void setMessage(String message) {
         if (message.length() > 140) {
-            throw new TweetTooLongException();
+
         } else {
             this.message = message;
         }

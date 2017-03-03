@@ -25,20 +25,20 @@ public class NormalTweet extends Tweet {
      * @param message the message
      * @throws TweetTooLongException the tweet too long exception
      */
-    public NormalTweet(Date date, String message) throws TweetTooLongException {
+    public NormalTweet(Date date, String message) {
         super(date, message);
     }
 
-    /**
-     * Instantiates a new Normal tweet.
-     *
-     * @param message the message
-     */
     public NormalTweet(String message) {
         super(message);
     }
 
+    @Override
     public Boolean isImportant() {
         return Boolean.FALSE;
+    }
+
+    public Date getDate() {
+        return null;
     }
 }
